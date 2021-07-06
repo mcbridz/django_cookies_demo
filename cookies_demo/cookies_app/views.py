@@ -99,8 +99,6 @@ def register(request):
             if user is None:
                 return HttpResponseRedirect(reverse('cookies_app:login'))
             django.contrib.auth.login(request, user)
-            new_profile = UserProfile(login_name=user)
-            new_profile.save()
             return HttpResponseRedirect(reverse('cookies_app:profile'))
         user = User.objects.create_user(
             username, request.POST['email'], password)
