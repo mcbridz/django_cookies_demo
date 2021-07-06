@@ -4,16 +4,32 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 import requests
-from .models import UserProfile
 import django.contrib.auth
+from datetime import datetime
+# Utility functions to get and translate date objects, the worst kind of objects..
 
+
+
+# Regular view functions
 
 def home(request):
-    context = {
-        'message': 'Hello World'
-    }
-    if request.method == 'GET':
+    if request.user.is_authenticated:
+        dt = datetime.now()
+        context= {
+            'message': 'Hello World',
+            'setting_cookie': False,
+            'year': dt.year,
+            'month': dt.month,
+            'day': dt.day,
+            'hour': dt.hour,
+            'minute': dt.minute,
+            'second': dt.second,
+            'username': request.user.username,
+        }
+        context['setting_cookie'] = True
         return render(request, 'cookies_app/home.html', context)
+    else:
+        return HttpResponseRedirect(reverse('cookies_app:login'))
 
 def login(request):
     # print(request.POST)
@@ -40,12 +56,8 @@ def login(request):
         password = request.POST['password']
         user = django.contrib.auth.authenticate(
             request, username=username, password=password)
-        if User.objects.filter(login_name=user).exists():
-            django.contrib.auth.login(request, user)
-            next = request.GET.get('next', reverse('cookies_app:home'))
-            return HttpResponseRedirect(next)
-        else:
-            return HttpResponseRedirect(reverse('cookies_app:login'))
+        next = request.GET.get('next', reverse('cookies_app:home'))
+        return HttpResponseRedirect(next)
     context = {
         'site_key': settings.RECAPTCHA_SITE_KEY
     }
@@ -96,8 +108,12 @@ def register(request):
         user.last_name = request.POST['last_name']
         user.save()
         django.contrib.auth.login(request, user)
-        return HttpResponseRedirect(reverse('cookies_app:profile'))
+        return HttpResponseRedirect(reverse('cookies_app:home'))
     context = {
         'site_key': settings.RECAPTCHA_SITE_KEY,
     }
     return render(request, 'cookies_app/register.html', context)
+
+def logout(request):
+    django.contrib.auth.logout(request)
+    return HttpResponseRedirect(reverse('cookies_app:login'))
