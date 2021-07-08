@@ -31,6 +31,9 @@
                 {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'cookies_app:login' %}">Login</a></li>
                 {% endif %}
+                <li class="nav-item"><a href="http://localhost:8000/madeup" class="nav-link">Bad URL request on server</a></li>
+                <li class="nav-item"><a href="{% url 'cookies_app:blowup' %}" class="nav-link">Make the server blow up</a></li>
+                <li class="nav-item"><a href="{% url 'cookies_app:impossible' %}" class="nav-link">Impossible permission check</a></li>
             </ul>
         </div>
     </nav>
